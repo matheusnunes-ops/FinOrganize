@@ -10,7 +10,7 @@ function goalCard(g,isEmergency=false){let c=document.createElement("article"),p
 function filteredHistory(){let q=$("searchInput").value.toLowerCase().trim(),type=$("filterType").value,pay=$("filterPayment").value,from=$("filterFrom").value,to=$("filterTo").value,cat=$("filterCategory").value;return [...transactions].filter(t=>(!q||(t.description+" "+t.category+" "+t.reason).toLowerCase().includes(q))&&(!type||t.type===type)&&(!pay||t.payment===pay)&&(!from||t.date>=from)&&(!to||t.date<=to)&&(!cat||t.category===cat)).sort((a,b)=>b.date.localeCompare(a.date)||(b.createdAt||b.id)-(a.createdAt||a.id))}
 function updateCategoryFilter(){let sel=$("filterCategory"),current=sel.value,all=[...new Set(transactions.map(t=>t.category).filter(Boolean))].sort();sel.innerHTML='<option value="">Todas as categorias</option>'+all.map(c=>`<option></option>`).join("");[...sel.options].slice(1).forEach((o,i)=>o.textContent=all[i]);if(all.includes(current))sel.value=current}
 function render(){let m=transactions.filter(t=>t.date.slice(0,7)===today().slice(0,7)),sorted=[...transactions].sort((a,b)=>b.date.localeCompare(a.date)||(b.createdAt||b.id)-(a.createdAt||a.id));$("bankBalance").textContent=money(balances.bank);$("cashBalance").textContent=money(balances.cash);$("totalBalance").textContent=money(balances.bank+balances.cash);$("monthIncome").textContent=money(sum(m,"income"));$("monthExpense").textContent=money(sum(m,"expense"));list("recentList",sorted.slice(0,4),"Seus lançamentos aparecerão aqui.");list("transactionList",sorted,"Nenhum lançamento cadastrado ainda.");updateCategoryFilter();let hist=filteredHistory();list("historyList",hist,"Nenhum resultado encontrado.",true);$("resultsCount").textContent=`${hist.length} ${hist.length===1?"movimentação encontrada":"movimentações encontradas"}`;$("nexorMessage").textContent=`Neste mês, você registrou ${money(sum(m,"income"))} em entradas e ${money(sum(m,"expense"))} em despesas.`;let gl=$("goalsList");gl.innerHTML="";gl.className=goals.length?"goal-list":"goal-list goal-empty";if(!goals.length)gl.textContent="Você ainda não criou metas pessoais.";goals.forEach(g=>gl.append(goalCard(g)));let ec=$("emergencyCard");ec.innerHTML="";ec.append(goalCard({name:"Reserva de emergência",target:emergency.target||0,saved:emergency.saved||0,description:"Uma proteção para imprevistos."},true))}
-function tab(t){document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id==="screen-"+t));document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.tab===t))}
+function tab(t){document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id==="screen-"+t));document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.tab===t));if(t==="home"&&typeof updateNexorBillAlert==="function")updateNexorBillAlert()}
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>tab(b.dataset.tab));document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>tab(b.dataset.go));
 function openTx(type,tx=null){$("typeField").value=type;$("dialogTitle").textContent=tx?"Editar lançamento":type==="income"?"Nova entrada":"Nova despesa";$("transactionEyebrow").textContent=tx?"CORRIGIR REGISTRO":"NOVO REGISTRO";$("saveTransactionBtn").textContent=tx?"Salvar alterações":"Salvar lançamento";$("categoryField").innerHTML=cats[type].map(x=>`<option>${x}</option>`).join("");$("dateField").value=tx?.date||today();$("amountField").value=tx?.amount??"";$("descriptionField").value=tx?.description||"";$("reasonField").value=tx?.reason||"";$("paymentField").value=tx?.payment||"bank";$("categoryField").value=tx?.category||cats[type][0];$("editingId").value=tx?String(tx.id):"";$("transactionDialog").showModal()}
 function editTx(id){let tx=transactions.find(t=>String(t.id)===String(id));if(tx)openTx(tx.type,tx)}
@@ -189,16 +189,6 @@ const originalRender=render;
 render=function(){
   originalRender();
   renderBills();
-  const pending=bills.filter(b=>b.status!=="paid");
-  const overdue=pending.filter(billIsOverdue);
-  const upcoming=pending.filter(b=>{
-    const days=Math.floor((new Date(b.dueDate+"T12:00:00")-new Date(localDateString()+"T12:00:00"))/86400000);
-    return days>=0&&days<=3;
-  });
-  if(overdue.length){
-    $("nexorMessage").textContent=`Atenção: você tem ${overdue.length} compromisso(s) em atraso, somando ${money(overdue.reduce((s,b)=>s+b.amount,0))}. Confira a área Contas para se organizar.`;
-  }else if(upcoming.length){
-    $("nexorMessage").textContent=`Você tem ${upcoming.length} compromisso(s) vencendo nos próximos 3 dias, no total de ${money(upcoming.reduce((s,b)=>s+b.amount,0))}.`;
-  }
+  updateNexorBillAlert();
 };
 render();

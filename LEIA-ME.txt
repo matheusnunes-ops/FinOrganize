@@ -33,3 +33,9 @@ CORREÇÃO V4.1
 - Corrige a atualização do alerta do Nexor sempre que contas são cadastradas, pagas ou excluídas.
 - Atualiza a mensagem sem depender de fechar e reabrir o aplicativo.
 - Para aplicar a correção, substitua app.js e sw.js no GitHub.
+
+
+CORREÇÃO V4.2
+- Atualiza o alerta do Nexor também ao voltar para a tela Início.
+- Centraliza a regra do alerta em uma única função, evitando lógica duplicada.
+- Substitua somente app.js e sw.js no GitHub.
