@@ -21,9 +21,49 @@
 <label class="full-filter">Categoria<select id="filterCategory"><option value="">Todas as categorias</option></select></label>
 </div><button class="text-btn clear-filters" id="clearFilters">Limpar filtros</button>
 <p class="results-count" id="resultsCount">0 movimentações</p><div id="historyList" class="transaction-list empty-state">Seu histórico aparecerá aqui.</div></section>
+<section class="screen" id="screen-calendar">
+<div class="eyebrow">PLANEJAMENTO FINANCEIRO</div><h1>Contas e calendário</h1>
+<p class="subheading">Organize vencimentos, compromissos e compras parceladas.</p>
+<div class="calendar-summary">
+  <article class="summary-card"><small>Em aberto</small><strong id="pendingBillsTotal">R$ 0,00</strong></article>
+  <article class="summary-card"><small>Em atraso</small><strong id="overdueBillsTotal">R$ 0,00</strong></article>
+</div>
+<button class="primary-btn full-width" id="addBillBtn">＋ Nova conta ou parcelamento</button>
+<div class="section-block">
+ <div class="section-heading"><h2>Próximos vencimentos</h2><span class="calendar-caption" id="calendarPeriod"></span></div>
+ <div id="billList" class="bill-list empty-state">Suas contas e compromissos aparecerão aqui.</div>
+</div>
+<div class="section-block">
+ <div class="section-heading"><h2>Como funciona</h2></div>
+ <p class="calendar-help">Cadastrar uma conta não desconta seu saldo. O valor só sai da sua conta quando você marcar o compromisso como pago. Parcelamentos criam os vencimentos individuais automaticamente.</p>
+</div>
+</section>
 <section class="screen" id="screen-nexor"><div class="eyebrow">ASSISTENTE FINANCEIRO</div><h1>Nexor</h1><div class="nexor-card"><div class="nexor-heading"><span class="nexor-symbol">✳</span><div><strong>NEXOR</strong><small>Seu parceiro de organização</small></div></div><p>Olá! Estou aqui para ajudar você a entender e organizar suas finanças. A conexão com a inteligência artificial será adicionada em uma próxima etapa.</p></div></section>
 </main>
-<nav class="bottom-nav"><button class="nav-item active" data-tab="home"><span>⌂</span><small>Início</small></button><button class="nav-item" data-tab="transactions"><span>⇄</span><small>Lançamentos</small></button><button class="nav-item" data-tab="goals"><span>◎</span><small>Metas</small></button><button class="nav-item" data-tab="history"><span>▤</span><small>Histórico</small></button><button class="nav-item" data-tab="nexor"><span>✳</span><small>Nexor</small></button></nav></div>
+<nav class="bottom-nav"><button class="nav-item active" data-tab="home"><span>⌂</span><small>Início</small></button><button class="nav-item" data-tab="transactions"><span>⇄</span><small>Lançamentos</small></button><button class="nav-item" data-tab="goals"><span>◎</span><small>Metas</small></button><button class="nav-item" data-tab="history"><span>▤</span><small>Histórico</small></button><button class="nav-item" data-tab="calendar"><span>▦</span><small>Contas</small></button><button class="nav-item" data-tab="nexor"><span>✳</span><small>Nexor</small></button></nav></div>
+<dialog id="billDialog"><form id="billForm" method="dialog">
+<div class="dialog-top"><div><div class="eyebrow">NOVO COMPROMISSO</div><h2 id="billDialogTitle">Cadastrar conta</h2></div><button type="button" class="icon-btn" id="closeBillDialog">×</button></div>
+<label>Tipo<select id="billKind"><option value="single">Conta única</option><option value="installment">Compra parcelada</option></select></label>
+<label>Nome / descrição<input id="billName" maxlength="70" placeholder="Ex.: Internet, compra..." required></label>
+<label>Valor da conta (R$)<input id="billAmount" type="number" min=".01" step=".01" required></label>
+<div id="installmentFields" class="hidden-fields">
+<label>Valor de cada parcela (R$)<input id="installmentAmount" type="number" min=".01" step=".01"></label>
+<label>Quantidade de parcelas<input id="installmentCount" type="number" min="2" max="120" step="1"></label>
+</div>
+<label>Primeiro vencimento<input id="billDueDate" type="date" required></label>
+<label>Conta para pagamento<select id="billPayment"><option value="bank">Banco / Pix / Débito</option><option value="cash">Dinheiro em espécie</option></select></label>
+<label>Observação (opcional)<input id="billNote" maxlength="120"></label>
+<button class="primary-btn submit-btn">Salvar compromisso</button>
+</form></dialog>
+<dialog id="billPayDialog"><form id="billPayForm" method="dialog">
+<div class="dialog-top"><div><div class="eyebrow">CONFIRMAR PAGAMENTO</div><h2 id="billPayTitle">Pagar conta</h2></div><button type="button" class="icon-btn" id="closeBillPayDialog">×</button></div>
+<input type="hidden" id="billPayId">
+<p class="calendar-help" id="billPayDescription"></p>
+<label>Valor pago (R$)<input id="billPayAmount" type="number" min=".01" step=".01" required></label>
+<label>Sair de<select id="billPaySource"><option value="bank">Banco</option><option value="cash">Dinheiro em espécie</option></select></label>
+<label>Data do pagamento<input id="billPayDate" type="date" required></label>
+<button class="primary-btn submit-btn">Confirmar pagamento</button>
+</form></dialog>
 <dialog id="transactionDialog"><form id="transactionForm" method="dialog"><div class="dialog-top"><div><div class="eyebrow" id="transactionEyebrow">NOVO REGISTRO</div><h2 id="dialogTitle">Nova despesa</h2></div><button type="button" class="icon-btn" id="closeDialog">×</button></div><input type="hidden" id="typeField"><input type="hidden" id="editingId"><label>Valor (R$)<input id="amountField" type="number" min=".01" step=".01" required></label><label>Categoria<select id="categoryField"></select></label><label>Data<input id="dateField" type="date" required></label><label>Descrição (opcional)<input id="descriptionField"></label><label>Motivo (opcional)<select id="reasonField"><option value="">Não informado</option><option>Necessidade</option><option>Impulso</option><option>Presente</option><option>Lazer</option><option>Emergência</option><option>Planejado</option><option>Investimento pessoal</option><option>Outro</option></select></label><label>Conta<select id="paymentField"><option value="bank">Banco / Pix / Débito</option><option value="cash">Dinheiro em espécie</option></select></label><button class="primary-btn submit-btn" id="saveTransactionBtn">Salvar lançamento</button></form></dialog>
 <dialog id="goalDialog"><form id="goalForm" method="dialog"><div class="dialog-top"><div><div class="eyebrow">NOVO OBJETIVO</div><h2 id="goalDialogTitle">Criar meta</h2></div><button type="button" class="icon-btn" id="closeGoalDialog">×</button></div><label>Nome da meta<input id="goalName" maxlength="55" required></label><label>Valor desejado (R$)<input id="goalTarget" type="number" min=".01" step=".01" required></label><label>Prazo (opcional)<input id="goalDeadline" type="date"></label><label>Descrição (opcional)<input id="goalDescription" maxlength="100"></label><button class="primary-btn submit-btn">Salvar</button></form></dialog>
 <dialog id="movementDialog"><form id="movementForm" method="dialog"><div class="dialog-top"><div><div class="eyebrow">MOVIMENTAÇÃO</div><h2 id="movementTitle">Guardar dinheiro</h2></div><button type="button" class="icon-btn" id="closeMovementDialog">×</button></div><input type="hidden" id="movementId"><input type="hidden" id="movementType"><label>Valor (R$)<input id="movementAmount" type="number" min=".01" step=".01" required></label><label>Conta<select id="movementSource"><option value="bank">Banco</option><option value="cash">Dinheiro em espécie</option></select></label><button class="primary-btn submit-btn" id="movementSubmit">Confirmar</button></form></dialog>

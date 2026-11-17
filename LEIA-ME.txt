@@ -1,19 +1,29 @@
-FinOrganize — Versão 3: Histórico e Lançamentos
+FinOrganize — Versão 4: Calendário Financeiro
 
-Instalação:
-1. Faça uma cópia de segurança dos dados importantes antes de atualizar.
+INSTALAÇÃO
+1. Faça uma cópia de segurança dos arquivos/dados importantes.
 2. Extraia esta pasta.
-3. Envie os arquivos para a raiz do repositório GitHub, substituindo os arquivos de mesmo nome.
+3. Envie os arquivos index.html, styles.css, app.js, manifest.webmanifest e sw.js para a raiz do repositório GitHub, substituindo os arquivos existentes.
 4. Faça Commit changes e aguarde o GitHub Pages publicar.
-5. Recarregue o app. O cache foi atualizado para finorganize-v3.
+5. Feche e abra novamente o app ou recarregue a página.
 
-Novidades:
-- Pesquisa por descrição, categoria e motivo.
-- Filtros por tipo, conta, intervalo de datas e categoria.
-- Edição de lançamentos.
-- Exclusão de lançamentos com ajuste automático do saldo.
+NOVIDADES
+- Nova área Contas e calendário.
+- Cadastro de contas únicas e compras parceladas.
+- Parcelamentos geram vencimentos mensais individuais.
+- Lista de compromissos pendentes, pagos e atrasados.
+- Resumo dos valores em aberto e em atraso.
+- Marcar como paga registra uma despesa no histórico e desconta o saldo escolhido.
+- O pagamento é vinculado ao compromisso para evitar duplicidade.
+- Nexor destaca contas atrasadas ou vencendo nos próximos 3 dias.
 
-Importante:
-- Os dados locais existentes usam as mesmas chaves localStorage da versão anterior.
+PRESERVAÇÃO DOS DADOS
+- Mantém as chaves existentes: finorganize_transactions, finorganize_balances, finorganize_goals e finorganize_emergency.
+- Nova chave: finorganize_bills.
 - Não limpe os dados do navegador durante a atualização.
-- Esta versão continua sendo um protótipo local; ainda não há sincronização ou backup automático.
+- As contas cadastradas não descontam o saldo até serem marcadas como pagas.
+
+IMPORTANTE
+- Os lembretes desta versão aparecem dentro do aplicativo; notificações push/automáticas do Android ainda não estão implementadas.
+- Esta versão continua sendo um protótipo local com localStorage. Não há sincronização nem backup automático.
+- O valor total da compra parcelada é informativo; o usuário informa o valor individual de cada parcela. A soma das parcelas não pode ser menor que o total informado.
