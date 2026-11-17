@@ -18,7 +18,7 @@ function applyBalance(tx,sign){let key=tx.payment==="cash"?"cash":"bank";balance
 function deleteTx(id){let tx=transactions.find(t=>String(t.id)===String(id));if(!tx)return;if(!confirm("Excluir este lançamento? O saldo da conta será ajustado."))return;applyBalance(tx,-1);transactions=transactions.filter(t=>String(t.id)!==String(id));save();render();toast("Lançamento excluído e saldo atualizado.")}
 $("quickAdd").onclick=()=>openTx("expense");$("closeDialog").onclick=()=>$("transactionDialog").close();document.querySelectorAll("[data-new]").forEach(b=>b.onclick=()=>openTx(b.dataset.new));
 ["searchInput","filterType","filterPayment","filterFrom","filterTo","filterCategory"].forEach(id=>$(id).addEventListener(id==="searchInput"?"input":"change",()=>{let hist=filteredHistory();list("historyList",hist,"Nenhum resultado encontrado.",true);$("resultsCount").textContent=`${hist.length} ${hist.length===1?"movimentação encontrada":"movimentações encontradas"}`}));$("clearFilters").onclick=()=>{["searchInput","filterType","filterPayment","filterFrom","filterTo","filterCategory"].forEach(id=>$(id).value="");render()};
-$("transactionForm").onsubmit=e=>{e.preventDefault();let amount=Number($("amountField").value),type=$("typeField").value,payment=$("paymentField").value,id=$("editingId").value;if(!(amount>0))return toast("Informe um valor válido.");let tx={id:id||String(Date.now()),type,amount,category:$("categoryField").value,date:$("dateField").value,description:$("descriptionField").value.trim(),reason:$("reasonField").value,payment,createdAt:id?(transactions.find(t=>String(t.id)===id)?.createdAt||Date.now()):Date.now()};if(id){let index=transactions.findIndex(t=>String(t.id)===id);if(index<0)return toast("Lançamento não encontrado.");applyBalance(transactions[index],-1);transactions[index]=tx;applyBalance(tx,1)}else{transactions.push(tx);applyBalance(tx,1)}save();render();$("transactionDialog").close();tab("transactions");toast(id?"Lançamento atualizado!":"Lançamento salvo!")};
+$("transactionForm").onsubmit=e=>{e.preventDefault();let amount=Number($("amountField").value),type=$("typeField").value,payment=$("paymentField").value,id=$("editingId").value;if(!(amount>0))return toast("Informe um valor válido.");let tx={id:id||String(Date.now()),type,amount,category:$("categoryField").value,date:$("dateField").value,description:$("descriptionField").value.trim(),reason:$("reasonField").value,payment,createdAt:id?(transactions.find(t=>String(t.id)===id)?.createdAt||Date.now()):Date.now()};if(id){let index=transactions.findIndex(t=>String(t.id)===id);if(index<0)return toast("Lançamento não encontrado.");applyBalance(transactions[index],-1);transactions[index]=tx;applyBalance(tx,1)}else{transactions.push(tx);applyBalance(tx,1)}save();$("transactionDialog").close();tab("transactions");render();toast(id?"Lançamento atualizado!":"Lançamento salvo!")};
 function openGoalDialog(isEmergency=false){$("goalDialogTitle").textContent=isEmergency?"Configurar reserva de emergência":"Criar meta";$("goalName").value=isEmergency?"Reserva de emergência":"";$("goalName").readOnly=isEmergency;$("goalTarget").value=isEmergency?(emergency.target||""):"";$("goalDeadline").value="";$("goalDescription").value=isEmergency?"Proteção para imprevistos.":"";$("goalForm").dataset.emergency=isEmergency?"true":"false";$("goalDialog").showModal()}
 $("addGoalBtn").onclick=()=>openGoalDialog();$("addEmergencyBtn").onclick=()=>{if(emergency.created){toast("Reserva já configurada. Use Guardar ou Retirar.");return}openGoalDialog(true)};$("closeGoalDialog").onclick=()=>$("goalDialog").close();
 $("goalForm").onsubmit=e=>{e.preventDefault();let target=Number($("goalTarget").value),isEm=$("goalForm").dataset.emergency==="true";if(!(target>0))return toast("Informe um valor desejado válido.");let g={id:String(Date.now()),name:$("goalName").value.trim(),target,saved:0,deadline:$("goalDeadline").value,description:$("goalDescription").value.trim()};if(isEm){emergency.target=target;emergency.created=true}else goals.push(g);save();render();$("goalDialog").close();toast(isEm?"Reserva configurada!":"Meta criada!")};
@@ -146,7 +146,7 @@ $("billForm").onsubmit=e=>{
       });
     }
   }
-  saveBills();renderBills();$("billDialog").close();toast(kind==="installment"?"Parcelamento cadastrado!":"Conta cadastrada!");
+  saveBills();$("billDialog").close();toast(kind==="installment"?"Parcelamento cadastrado!":"Conta cadastrada!");renderBills();
 };
 function openBillPayment(id){
   const b=bills.find(x=>x.id===id);
@@ -174,8 +174,7 @@ $("billPayForm").onsubmit=e=>{
   transactions.push(tx);
   balances[source]-=amount;
   b.status="paid";b.paidDate=payDate;b.paidAmount=amount;b.payment=source;b.transactionId=txId;
-  save();saveBills();render();renderBills();
-  $("billPayDialog").close();tab("calendar");toast("Pagamento registrado no histórico e no saldo!");
+  save();saveBills();$("billPayDialog").close();tab("calendar");render();renderBills();toast("Pagamento registrado no histórico e no saldo!");
 };
 function deleteBill(id){
   const b=bills.find(x=>x.id===id);
@@ -192,3 +191,23 @@ render=function(){
   updateNexorBillAlert();
 };
 render();
+
+
+// Evita cliques repetidos durante o processamento de formulários.
+["transactionForm","billForm","billPayForm"].forEach(formId=>{
+  const form=$(formId);
+  if(!form) return;
+  form.addEventListener("submit",()=>{
+    const btn=form.querySelector('button[type="submit"],button:not([type])');
+    if(btn){
+      btn.disabled=true;
+      const original=btn.textContent;
+      btn.textContent="Salvando...";
+      const dialog=form.closest("dialog");
+      if(dialog) dialog.addEventListener("close",()=>{
+        btn.disabled=false;
+        btn.textContent=original;
+      },{once:true});
+    }
+  },true);
+});
