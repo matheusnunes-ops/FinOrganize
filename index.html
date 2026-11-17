@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101b18">
+  <meta name="description" content="FinOrganize — sua organização financeira pessoal.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <title>FinOrganize</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">F</span><div><strong>FinOrganize</strong><small>Seu dinheiro em ordem</small></div></div>
+      <button class="icon-btn" id="quickAdd" aria-label="Novo lançamento">＋</button>
+    </header>
+
+    <main>
+      <section class="screen active" id="screen-home">
+        <div class="eyebrow">VISÃO GERAL</div>
+        <article class="balance-card">
+          <div class="muted">Saldo disponível</div>
+          <div class="balance" id="totalBalance">R$ 0,00</div>
+          <div class="balance-foot"><span>Banco <b id="bankBalance">R$ 0,00</b></span><span>Em espécie <b id="cashBalance">R$ 0,00</b></span></div>
+        </article>
+        <div class="summary-grid">
+          <article class="summary-card"><span class="summary-icon income">↗</span><small>Entradas do mês</small><strong id="monthIncome">R$ 0,00</strong></article>
+          <article class="summary-card"><span class="summary-icon expense">↘</span><small>Despesas do mês</small><strong id="monthExpense">R$ 0,00</strong></article>
+        </div>
+        <section class="section-block">
+          <div class="section-heading"><h2>Movimentações recentes</h2><button class="text-btn" data-go="history">Ver todas</button></div>
+          <div id="recentList" class="transaction-list empty-state">Seus lançamentos aparecerão aqui.</div>
+        </section>
+        <section class="nexor-card">
+          <div class="nexor-heading"><span class="nexor-symbol">✳</span><div><strong>NEXOR</strong><small>Seu assistente financeiro</small></div></div>
+          <p id="nexorMessage">Vamos organizar suas finanças. Registre sua primeira movimentação para começarmos.</p>
+        </section>
+      </section>
+
+      <section class="screen" id="screen-transactions">
+        <div class="eyebrow">MOVIMENTAÇÕES</div><h1>Lançamentos</h1>
+        <p class="subheading">Registre suas entradas e despesas.</p>
+        <div class="quick-actions"><button class="primary-btn" data-new="income">＋ Nova entrada</button><button class="secondary-btn" data-new="expense">－ Nova despesa</button></div>
+        <div id="transactionList" class="transaction-list empty-state">Nenhum lançamento cadastrado ainda.</div>
+      </section>
+
+      <section class="screen" id="screen-goals">
+        <div class="eyebrow">SEUS PLANOS</div><h1>Metas</h1>
+        <p class="subheading">Organize o dinheiro que você está guardando.</p>
+        <div class="goal-placeholder"><div class="goal-icon">◎</div><h3>Suas metas começam aqui</h3><p>Na próxima etapa vamos adicionar criação de metas, depósitos e reserva de emergência.</p></div>
+      </section>
+
+      <section class="screen" id="screen-history">
+        <div class="eyebrow">ACOMPANHAMENTO</div><h1>Histórico</h1>
+        <input class="search-input" id="searchInput" type="search" placeholder="Pesquisar descrição ou categoria">
+        <div id="historyList" class="transaction-list empty-state">Seu histórico aparecerá aqui.</div>
+      </section>
+
+      <section class="screen" id="screen-nexor">
+        <div class="eyebrow">ASSISTENTE FINANCEIRO</div><h1>Nexor</h1>
+        <div class="nexor-card large"><div class="nexor-heading"><span class="nexor-symbol">✳</span><div><strong>NEXOR</strong><small>Seu parceiro de organização</small></div></div><p>Olá! Estou aqui para ajudar você a entender e organizar suas finanças. Nesta primeira versão, ainda não estou conectado a uma IA, mas já vamos preparar essa área.</p></div>
+        <div class="suggestion">Quanto entrou e saiu neste mês?</div><div class="suggestion">Como posso organizar meus gastos?</div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <button class="nav-item active" data-tab="home"><span>⌂</span><small>Início</small></button>
+      <button class="nav-item" data-tab="transactions"><span>⇄</span><small>Lançamentos</small></button>
+      <button class="nav-item" data-tab="goals"><span>◎</span><small>Metas</small></button>
+      <button class="nav-item" data-tab="history"><span>▤</span><small>Histórico</small></button>
+      <button class="nav-item" data-tab="nexor"><span>✳</span><small>Nexor</small></button>
+    </nav>
+  </div>
+
+  <dialog id="transactionDialog">
+    <form id="transactionForm" method="dialog">
+      <div class="dialog-top"><div><div class="eyebrow">NOVO REGISTRO</div><h2 id="dialogTitle">Nova despesa</h2></div><button type="button" class="icon-btn close-btn" id="closeDialog">×</button></div>
+      <input type="hidden" id="typeField" value="expense">
+      <label>Valor (R$)<input id="amountField" type="number" min="0.01" step="0.01" placeholder="0,00" required></label>
+      <label>Categoria<select id="categoryField" required></select></label>
+      <label>Data<input id="dateField" type="date" required></label>
+      <label>Descrição (opcional)<input id="descriptionField" type="text" maxlength="80" placeholder="Ex.: almoço"></label>
+      <label>Motivo (opcional)<select id="reasonField"><option value="">Não informado</option><option>Necessidade</option><option>Impulso</option><option>Presente</option><option>Lazer</option><option>Emergência</option><option>Planejado</option><option>Investimento pessoal</option><option>Outro</option></select></label>
+      <label>Forma de pagamento/recebimento<select id="paymentField"><option value="bank">Banco / Pix / Débito</option><option value="cash">Dinheiro em espécie</option></select></label>
+      <button class="primary-btn submit-btn" type="submit">Salvar lançamento</button>
+    </form>
+  </dialog>
+  <div id="toast" role="status" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
