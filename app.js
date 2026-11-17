@@ -51,6 +51,9 @@ function monthAdd(dateString, months){
 function billIsOverdue(b){
   return b.status!=="paid" && b.dueDate < localDateString();
 }
+function updateNexorBillAlert(){
+  updateNexorBillAlert();
+}
 function renderBills(){
   const listEl=$("billList");
   const todayStr=localDateString();
@@ -67,6 +70,7 @@ function renderBills(){
   if(!sorted.length){
     listEl.className="bill-list empty-state";
     listEl.textContent="Nenhuma conta ou compra parcelada cadastrada.";
+    updateNexorBillAlert();
     return;
   }
   listEl.className="bill-list";
@@ -102,6 +106,7 @@ function renderBills(){
     }
     listEl.append(card);
   });
+  updateNexorBillAlert();
 }
 function openBillDialog(){
   $("billForm").reset();
