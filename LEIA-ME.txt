@@ -1,3 +1,19 @@
-FINORGANIZE — VERSÃO 2: METAS
-Inclui criação de metas pessoais com nome, valor desejado, prazo e descrição; acompanhamento do progresso; depósitos e retiradas; reserva de emergência separada. Ao depositar, o valor é transferido do saldo bancário ou dinheiro em espécie para o valor guardado. Retiradas devolvem ao saldo escolhido. Movimentações de metas não são receita nem despesa.
-Dados ficam no armazenamento local do navegador; limpar os dados do navegador pode apagá-los. Não há backup ou sincronização. Teste com valores fictícios.
+FinOrganize — Versão 3: Histórico e Lançamentos
+
+Instalação:
+1. Faça uma cópia de segurança dos dados importantes antes de atualizar.
+2. Extraia esta pasta.
+3. Envie os arquivos para a raiz do repositório GitHub, substituindo os arquivos de mesmo nome.
+4. Faça Commit changes e aguarde o GitHub Pages publicar.
+5. Recarregue o app. O cache foi atualizado para finorganize-v3.
+
+Novidades:
+- Pesquisa por descrição, categoria e motivo.
+- Filtros por tipo, conta, intervalo de datas e categoria.
+- Edição de lançamentos.
+- Exclusão de lançamentos com ajuste automático do saldo.
+
+Importante:
+- Os dados locais existentes usam as mesmas chaves localStorage da versão anterior.
+- Não limpe os dados do navegador durante a atualização.
+- Esta versão continua sendo um protótipo local; ainda não há sincronização ou backup automático.
