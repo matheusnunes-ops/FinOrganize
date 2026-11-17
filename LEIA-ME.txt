@@ -1,23 +1,3 @@
-FINORGANIZE — PRIMEIRA VERSÃO FUNCIONAL
-
-O que já funciona:
-- Navegação entre Início, Lançamentos, Metas, Histórico e Nexor.
-- Cadastro manual de entradas e despesas.
-- Categorias iniciais, motivo opcional e forma de pagamento.
-- Separação entre saldo bancário e dinheiro em espécie.
-- Atualização automática dos saldos e totais do mês.
-- Pesquisa no histórico.
-- Armazenamento local no navegador do aparelho.
-
-IMPORTANTE:
-Esta é a primeira base funcional (MVP), não a versão final.
-Os dados ficam no armazenamento local do navegador. Limpar os dados do navegador pode apagá-los; ainda não há sincronização ou backup.
-Metas, reserva, contas, calendário, relatórios e IA real do Nexor serão implementados nas próximas etapas.
-A IA do Nexor ainda não está conectada.
-
-COMO TESTAR:
-1. Publique os arquivos em um serviço de hospedagem HTTPS (por exemplo, GitHub Pages).
-2. Abra o endereço publicado no Chrome do Android.
-3. No menu do Chrome, escolha "Adicionar à tela inicial" ou "Instalar app", se a opção aparecer.
-
-Para gerar um APK Android nativo posteriormente, será necessária uma etapa adicional de empacotamento e teste.
+FINORGANIZE — VERSÃO 2: METAS
+Inclui criação de metas pessoais com nome, valor desejado, prazo e descrição; acompanhamento do progresso; depósitos e retiradas; reserva de emergência separada. Ao depositar, o valor é transferido do saldo bancário ou dinheiro em espécie para o valor guardado. Retiradas devolvem ao saldo escolhido. Movimentações de metas não são receita nem despesa.
+Dados ficam no armazenamento local do navegador; limpar os dados do navegador pode apagá-los. Não há backup ou sincronização. Teste com valores fictícios.

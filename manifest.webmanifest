@@ -1,9 +1,1 @@
-{
-  "name": "FinOrganize",
-  "short_name": "FinOrganize",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#0d1512",
-  "theme_color": "#101b18",
-  "description": "Sua organização financeira pessoal."
-}
+{"name": "FinOrganize", "short_name": "FinOrganize", "start_url": "./", "display": "standalone", "background_color": "#0d1512", "theme_color": "#101b18"}
