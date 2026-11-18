@@ -10,7 +10,7 @@ function goalCard(g,isEmergency=false){let c=document.createElement("article"),p
 function filteredHistory(){let q=$("searchInput").value.toLowerCase().trim(),type=$("filterType").value,pay=$("filterPayment").value,from=$("filterFrom").value,to=$("filterTo").value,cat=$("filterCategory").value;return [...transactions].filter(t=>(!q||(t.description+" "+t.category+" "+t.reason).toLowerCase().includes(q))&&(!type||t.type===type)&&(!pay||t.payment===pay)&&(!from||t.date>=from)&&(!to||t.date<=to)&&(!cat||t.category===cat)).sort((a,b)=>b.date.localeCompare(a.date)||(b.createdAt||b.id)-(a.createdAt||a.id))}
 function updateCategoryFilter(){let sel=$("filterCategory"),current=sel.value,all=[...new Set(transactions.map(t=>t.category).filter(Boolean))].sort();sel.innerHTML='<option value="">Todas as categorias</option>'+all.map(c=>`<option></option>`).join("");[...sel.options].slice(1).forEach((o,i)=>o.textContent=all[i]);if(all.includes(current))sel.value=current}
 function render(){let m=transactions.filter(t=>t.date.slice(0,7)===today().slice(0,7)),sorted=[...transactions].sort((a,b)=>b.date.localeCompare(a.date)||(b.createdAt||b.id)-(a.createdAt||a.id));$("bankBalance").textContent=money(balances.bank);$("cashBalance").textContent=money(balances.cash);$("totalBalance").textContent=money(balances.bank+balances.cash);$("monthIncome").textContent=money(sum(m,"income"));$("monthExpense").textContent=money(sum(m,"expense"));list("recentList",sorted.slice(0,4),"Seus lançamentos aparecerão aqui.");list("transactionList",sorted,"Nenhum lançamento cadastrado ainda.");updateCategoryFilter();let hist=filteredHistory();list("historyList",hist,"Nenhum resultado encontrado.",true);$("resultsCount").textContent=`${hist.length} ${hist.length===1?"movimentação encontrada":"movimentações encontradas"}`;$("nexorMessage").textContent=`Neste mês, você registrou ${money(sum(m,"income"))} em entradas e ${money(sum(m,"expense"))} em despesas.`;let gl=$("goalsList");gl.innerHTML="";gl.className=goals.length?"goal-list":"goal-list goal-empty";if(!goals.length)gl.textContent="Você ainda não criou metas pessoais.";goals.forEach(g=>gl.append(goalCard(g)));let ec=$("emergencyCard");ec.innerHTML="";ec.append(goalCard({name:"Reserva de emergência",target:emergency.target||0,saved:emergency.saved||0,description:"Uma proteção para imprevistos."},true))}
-function tab(t){document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id==="screen-"+t));document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.tab===t))}
+function tab(t){document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id==="screen-"+t));document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.tab===t));if(t==="home"&&typeof updateNexorBillAlert==="function")updateNexorBillAlert()}
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>tab(b.dataset.tab));document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>tab(b.dataset.go));
 function openTx(type,tx=null){$("typeField").value=type;$("dialogTitle").textContent=tx?"Editar lançamento":type==="income"?"Nova entrada":"Nova despesa";$("transactionEyebrow").textContent=tx?"CORRIGIR REGISTRO":"NOVO REGISTRO";$("saveTransactionBtn").textContent=tx?"Salvar alterações":"Salvar lançamento";$("categoryField").innerHTML=cats[type].map(x=>`<option>${x}</option>`).join("");$("dateField").value=tx?.date||today();$("amountField").value=tx?.amount??"";$("descriptionField").value=tx?.description||"";$("reasonField").value=tx?.reason||"";$("paymentField").value=tx?.payment||"bank";$("categoryField").value=tx?.category||cats[type][0];$("editingId").value=tx?String(tx.id):"";$("transactionDialog").showModal()}
 function editTx(id){let tx=transactions.find(t=>String(t.id)===String(id));if(tx)openTx(tx.type,tx)}
@@ -18,7 +18,7 @@ function applyBalance(tx,sign){let key=tx.payment==="cash"?"cash":"bank";balance
 function deleteTx(id){let tx=transactions.find(t=>String(t.id)===String(id));if(!tx)return;if(!confirm("Excluir este lançamento? O saldo da conta será ajustado."))return;applyBalance(tx,-1);transactions=transactions.filter(t=>String(t.id)!==String(id));save();render();toast("Lançamento excluído e saldo atualizado.")}
 $("quickAdd").onclick=()=>openTx("expense");$("closeDialog").onclick=()=>$("transactionDialog").close();document.querySelectorAll("[data-new]").forEach(b=>b.onclick=()=>openTx(b.dataset.new));
 ["searchInput","filterType","filterPayment","filterFrom","filterTo","filterCategory"].forEach(id=>$(id).addEventListener(id==="searchInput"?"input":"change",()=>{let hist=filteredHistory();list("historyList",hist,"Nenhum resultado encontrado.",true);$("resultsCount").textContent=`${hist.length} ${hist.length===1?"movimentação encontrada":"movimentações encontradas"}`}));$("clearFilters").onclick=()=>{["searchInput","filterType","filterPayment","filterFrom","filterTo","filterCategory"].forEach(id=>$(id).value="");render()};
-$("transactionForm").onsubmit=e=>{e.preventDefault();let amount=Number($("amountField").value),type=$("typeField").value,payment=$("paymentField").value,id=$("editingId").value;if(!(amount>0))return toast("Informe um valor válido.");let tx={id:id||String(Date.now()),type,amount,category:$("categoryField").value,date:$("dateField").value,description:$("descriptionField").value.trim(),reason:$("reasonField").value,payment,createdAt:id?(transactions.find(t=>String(t.id)===id)?.createdAt||Date.now()):Date.now()};if(id){let index=transactions.findIndex(t=>String(t.id)===id);if(index<0)return toast("Lançamento não encontrado.");applyBalance(transactions[index],-1);transactions[index]=tx;applyBalance(tx,1)}else{transactions.push(tx);applyBalance(tx,1)}save();render();$("transactionDialog").close();tab("transactions");toast(id?"Lançamento atualizado!":"Lançamento salvo!")};
+$("transactionForm").onsubmit=e=>{e.preventDefault();let amount=Number($("amountField").value),type=$("typeField").value,payment=$("paymentField").value,id=$("editingId").value;if(!(amount>0))return toast("Informe um valor válido.");let tx={id:id||String(Date.now()),type,amount,category:$("categoryField").value,date:$("dateField").value,description:$("descriptionField").value.trim(),reason:$("reasonField").value,payment,createdAt:id?(transactions.find(t=>String(t.id)===id)?.createdAt||Date.now()):Date.now()};if(id){let index=transactions.findIndex(t=>String(t.id)===id);if(index<0)return toast("Lançamento não encontrado.");applyBalance(transactions[index],-1);transactions[index]=tx;applyBalance(tx,1)}else{transactions.push(tx);applyBalance(tx,1)}save();$("transactionDialog").close();tab("transactions");render();toast(id?"Lançamento atualizado!":"Lançamento salvo!")};
 function openGoalDialog(isEmergency=false){$("goalDialogTitle").textContent=isEmergency?"Configurar reserva de emergência":"Criar meta";$("goalName").value=isEmergency?"Reserva de emergência":"";$("goalName").readOnly=isEmergency;$("goalTarget").value=isEmergency?(emergency.target||""):"";$("goalDeadline").value="";$("goalDescription").value=isEmergency?"Proteção para imprevistos.":"";$("goalForm").dataset.emergency=isEmergency?"true":"false";$("goalDialog").showModal()}
 $("addGoalBtn").onclick=()=>openGoalDialog();$("addEmergencyBtn").onclick=()=>{if(emergency.created){toast("Reserva já configurada. Use Guardar ou Retirar.");return}openGoalDialog(true)};$("closeGoalDialog").onclick=()=>$("goalDialog").close();
 $("goalForm").onsubmit=e=>{e.preventDefault();let target=Number($("goalTarget").value),isEm=$("goalForm").dataset.emergency==="true";if(!(target>0))return toast("Informe um valor desejado válido.");let g={id:String(Date.now()),name:$("goalName").value.trim(),target,saved:0,deadline:$("goalDeadline").value,description:$("goalDescription").value.trim()};if(isEm){emergency.target=target;emergency.created=true}else goals.push(g);save();render();$("goalDialog").close();toast(isEm?"Reserva configurada!":"Meta criada!")};
@@ -146,7 +146,7 @@ $("billForm").onsubmit=e=>{
       });
     }
   }
-  saveBills();renderBills();$("billDialog").close();toast(kind==="installment"?"Parcelamento cadastrado!":"Conta cadastrada!");
+  saveBills();$("billDialog").close();toast(kind==="installment"?"Parcelamento cadastrado!":"Conta cadastrada!");renderBills();
 };
 function openBillPayment(id){
   const b=bills.find(x=>x.id===id);
@@ -174,8 +174,7 @@ $("billPayForm").onsubmit=e=>{
   transactions.push(tx);
   balances[source]-=amount;
   b.status="paid";b.paidDate=payDate;b.paidAmount=amount;b.payment=source;b.transactionId=txId;
-  save();saveBills();render();renderBills();
-  $("billPayDialog").close();tab("calendar");toast("Pagamento registrado no histórico e no saldo!");
+  save();saveBills();$("billPayDialog").close();tab("calendar");render();renderBills();toast("Pagamento registrado no histórico e no saldo!");
 };
 function deleteBill(id){
   const b=bills.find(x=>x.id===id);
@@ -189,16 +188,26 @@ const originalRender=render;
 render=function(){
   originalRender();
   renderBills();
-  const pending=bills.filter(b=>b.status!=="paid");
-  const overdue=pending.filter(billIsOverdue);
-  const upcoming=pending.filter(b=>{
-    const days=Math.floor((new Date(b.dueDate+"T12:00:00")-new Date(localDateString()+"T12:00:00"))/86400000);
-    return days>=0&&days<=3;
-  });
-  if(overdue.length){
-    $("nexorMessage").textContent=`Atenção: você tem ${overdue.length} compromisso(s) em atraso, somando ${money(overdue.reduce((s,b)=>s+b.amount,0))}. Confira a área Contas para se organizar.`;
-  }else if(upcoming.length){
-    $("nexorMessage").textContent=`Você tem ${upcoming.length} compromisso(s) vencendo nos próximos 3 dias, no total de ${money(upcoming.reduce((s,b)=>s+b.amount,0))}.`;
-  }
+  updateNexorBillAlert();
 };
 render();
+
+
+// Evita cliques repetidos durante o processamento de formulários.
+["transactionForm","billForm","billPayForm"].forEach(formId=>{
+  const form=$(formId);
+  if(!form) return;
+  form.addEventListener("submit",()=>{
+    const btn=form.querySelector('button[type="submit"],button:not([type])');
+    if(btn){
+      btn.disabled=true;
+      const original=btn.textContent;
+      btn.textContent="Salvando...";
+      const dialog=form.closest("dialog");
+      if(dialog) dialog.addEventListener("close",()=>{
+        btn.disabled=false;
+        btn.textContent=original;
+      },{once:true});
+    }
+  },true);
+});
