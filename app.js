@@ -52,8 +52,29 @@ function billIsOverdue(b){
   return b.status!=="paid" && b.dueDate < localDateString();
 }
 function updateNexorBillAlert(){
-  updateNexorBillAlert();
+  const message=$("nexorMessage");
+  if(!message) return;
+
+  const todayStr=localDateString();
+  const pending=bills.filter(b=>b.status!=="paid");
+  const overdue=pending.filter(b=>billIsOverdue(b));
+
+  if(overdue.length){
+    const total=overdue.reduce((s,b)=>s+b.amount,0);
+    message.textContent=`Atenção! Você tem ${overdue.length} conta(s) atrasada(s), totalizando ${money(total)}. Não se esqueça de regularizar esses compromissos.`;
+    return;
+  }
+
+  const upcoming=pending
+    .filter(b=>b.dueDate>=todayStr)
+    .sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+
+  if(upcoming.length){
+    const next=upcoming[0];
+    message.textContent=`Você tem ${pending.length} compromisso(s) pendente(s). O próximo vencimento é ${next.name}, em ${dateBR(next.dueDate)}.`;
+  }
 }
+  
 function renderBills(){
   const listEl=$("billList");
   const todayStr=localDateString();
